@@ -259,6 +259,21 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
+    const homeBtn = $('homeBtn');
+    homeBtn.addEventListener('click', () => {
+        files = []; fileRelativePaths = {}; sourceFolderName = '';
+        fileInput.value = ''; folderInput.value = '';
+        selectedFilesEl.innerHTML = '';
+        uploadSection.style.display = '';
+        uploadSection.classList.remove('hidden');
+        settingsSection.classList.add('hidden');
+        progressSection.classList.add('hidden');
+        resultsSection.classList.add('hidden');
+        progressBar.style.width = '0%';
+        previewResults = [];
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
     // ---- Preview Modal ----
     let previewResults = [];
     let previewIndex = 0;
