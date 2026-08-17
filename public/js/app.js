@@ -356,6 +356,7 @@
 
     // Store results + add click handlers
     function showResults(results, totalOriginal, totalCompressed) {
+        const resultsList = $('resultsList');
         previewResults = results.filter(r => r.blob).map(r => ({
             name: r.name,
             originalSize: r.originalSize,
@@ -367,28 +368,31 @@
         progressSection.classList.add('hidden');
         resultsSection.classList.remove('hidden');
         resultsSection.classList.add('fade-in');
-        resultsBody.innerHTML = '';
+        resultsList.innerHTML = '';
 
         results.forEach((r, idx) => {
             const saving = r.originalSize - r.compressedSize;
             const pct = r.originalSize > 0 ? Math.round((saving / r.originalSize) * 100) : 0;
             const cls = r.status === 'Gagal' ? 'status-fail' : r.status === 'Sudah sesuai' ? 'status-skip' : 'status-ok';
-            const row = document.createElement('tr');
-            if (r.blob) row.style.cursor = 'pointer';
-            row.innerHTML = `
-                <td class="cell-name">${esc(r.name)}</td>
-                <td>${fmt(r.originalSize)}</td>
-                <td>${fmt(targetBytes)}</td>
-                <td>${fmt(r.compressedSize)}</td>
-                <td class="cell-saving">${r.status === 'Gagal' ? '-' : pct + '%'}</td>
-                <td><span class="badge ${cls}">${r.status}</span></td>`;
+            const card = document.createElement('div');
+            card.className = 'result-card';
+            card.innerHTML = `
+                <span class="result-name">${esc(r.name)}</span>
+                <span class="result-status"><span class="badge ${cls}">${r.status}</span></span>
+                <div class="result-meta">
+                    <span class="size-original">${fmt(r.originalSize)}</span>
+                    <span class="arrow">&rarr;</span>
+                    <span class="size-result">${fmt(r.compressedSize)}</span>
+                    <span class="target">(${fmt(targetBytes)})</span>
+                    ${r.status !== 'Gagal' ? `<span class="saving">-${pct}%</span>` : ''}
+                </div>`;
             if (r.blob) {
-                row.addEventListener('click', () => {
+                card.addEventListener('click', () => {
                     const previewIdx = previewResults.findIndex(p => p.name === r.name);
                     if (previewIdx >= 0) openPreview(previewIdx);
                 });
             }
-            resultsBody.appendChild(row);
+            resultsList.appendChild(card);
         });
 
         const saved = totalOriginal - totalCompressed;
