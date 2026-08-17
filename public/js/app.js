@@ -54,53 +54,7 @@
     let zipBlob = null;
 
     pickFilesBtn.addEventListener('click', e => { e.stopPropagation(); fileInput.click(); });
-
-    // Folder confirm modal
-    const confirmModal = $('confirmModal');
-    const confirmOk = $('confirmOk');
-    const confirmCancel = $('confirmCancel');
-
-    pickFolderBtn.addEventListener('click', e => {
-        e.stopPropagation();
-        confirmModal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    });
-
-    confirmOk.addEventListener('click', async () => {
-        confirmModal.classList.remove('active');
-        document.body.style.overflow = '';
-
-        // Modern API: showDirectoryPicker - no double warning
-        if ('showDirectoryPicker' in window) {
-            try {
-                const dirHandle = await window.showDirectoryPicker();
-                const imageFiles = [];
-                const paths = {};
-
-                for await (const entry of dirHandle.values()) {
-                    if (entry.kind === 'file') {
-                        const file = await entry.getFile();
-                        if (file.type.startsWith('image/')) {
-                            imageFiles.push(file);
-                            paths[file.name] = dirHandle.name + '/' + file.name;
-                        }
-                    }
-                }
-
-                if (imageFiles.length > 0) {
-                    files = imageFiles;
-                    fileRelativePaths = paths;
-                    sourceFolderName = dirHandle.name;
-                    showSelectedCount();
-                }
-            } catch (err) {
-                // User cancelled or error
-            }
-        } else {
-            // Fallback for browsers without showDirectoryPicker
-            folderInput.click();
-        }
-    });
+    pickFolderBtn.addEventListener('click', e => { e.stopPropagation(); folderInput.click(); });
 
     confirmCancel.addEventListener('click', () => {
         confirmModal.classList.remove('active');
