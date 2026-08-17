@@ -54,10 +54,33 @@
     let zipBlob = null;
 
     pickFilesBtn.addEventListener('click', e => { e.stopPropagation(); fileInput.click(); });
+
+    // Folder confirm modal
+    const confirmModal = $('confirmModal');
+    const confirmOk = $('confirmOk');
+    const confirmCancel = $('confirmCancel');
+
     pickFolderBtn.addEventListener('click', e => {
         e.stopPropagation();
-        if (confirm('Browser akan meminta akses ke folder yang dipilih.\nSemua foto di dalamnya akan diproses.\n\nLanjutkan?')) {
-            folderInput.click();
+        confirmModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    });
+
+    confirmOk.addEventListener('click', () => {
+        confirmModal.classList.remove('active');
+        document.body.style.overflow = '';
+        folderInput.click();
+    });
+
+    confirmCancel.addEventListener('click', () => {
+        confirmModal.classList.remove('active');
+        document.body.style.overflow = '';
+    });
+
+    confirmModal.addEventListener('click', e => {
+        if (e.target === confirmModal) {
+            confirmModal.classList.remove('active');
+            document.body.style.overflow = '';
         }
     });
 
