@@ -644,13 +644,14 @@ body::after {
 
 /* ---- Button Group ---- */
 .btn-group {
-    display: flex;
-    gap: 12px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
 }
 
 .btn-group .btn {
-    flex: 1;
     min-width: 0;
+    justify-content: center;
 }
 
 /* ---- Footer ---- */
@@ -1070,7 +1071,7 @@ body::after {
     .result-name { font-size: 0.8rem; }
     .result-meta { font-size: 0.7rem; gap: 4px; }
 
-    .btn-group { flex-direction: column; gap: 8px; }
+    .btn-group { grid-template-columns: 1fr; gap: 8px; }
     .btn-lg { padding: 12px 16px; font-size: 0.88rem; }
 
     .upload-buttons { grid-template-columns: 1fr 1fr; gap: 8px; }
