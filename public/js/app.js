@@ -28,9 +28,7 @@
 
     const dropzone = $('dropzone');
     const fileInput = $('fileInput');
-    const folderInput = $('folderInput');
     const pickFilesBtn = $('pickFilesBtn');
-    const pickFolderBtn = $('pickFolderBtn');
     const selectedFilesEl = $('selectedFiles');
     const uploadSection = $('uploadSection');
     const settingsSection = $('settingsSection');
@@ -54,30 +52,68 @@
     let zipBlob = null;
 
     pickFilesBtn.addEventListener('click', e => { e.stopPropagation(); fileInput.click(); });
-    pickFolderBtn.addEventListener('click', e => { e.stopPropagation(); folderInput.click(); });
-
-    confirmCancel.addEventListener('click', () => {
-        confirmModal.classList.remove('active');
-        document.body.style.overflow = '';
-    });
-
-    confirmModal.addEventListener('click', e => {
-        if (e.target === confirmModal) {
-            confirmModal.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-    });
 
     dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('dragover'); });
     dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
-    dropzone.addEventListener('drop', e => {
+    dropzone.addEventListener('drop', async e => {
         e.preventDefault();
         dropzone.classList.remove('dragover');
-        handleFiles(e.dataTransfer.files);
+
+        const items = e.dataTransfer.items;
+        if (items) {
+            const allFiles = [];
+            const allPaths = {};
+            let topFolder = 'Foto';
+
+            const entries = [];
+            for (let i = 0; i < items.length; i++) {
+                const entry = items[i].webkitGetAsEntry?.() || items[i].getAsEntry?.();
+                if (entry) entries.push(entry);
+            }
+
+            async function readEntry(entry, path) {
+                if (entry.isFile) {
+                    const file = await new Promise((resolve, reject) => entry.file(resolve, reject));
+                    if (file.type.startsWith('image/')) {
+                        allFiles.push(file);
+                        allPaths[file.name] = path + file.name;
+                    }
+                } else if (entry.isDirectory) {
+                    const reader = entry.createReader();
+                    const subEntries = await new Promise((resolve) => {
+                        const all = [];
+                        function readBatch() {
+                            reader.readEntries((batch) => {
+                                if (batch.length === 0) { resolve(all); return; }
+                                all.push(...batch);
+                                readBatch();
+                            });
+                        }
+                        readBatch();
+                    });
+                    for (const sub of subEntries) {
+                        await readEntry(sub, path + entry.name + '/');
+                    }
+                }
+            }
+
+            for (const entry of entries) {
+                if (entry.isDirectory) topFolder = entry.name;
+                await readEntry(entry, '');
+            }
+
+            if (allFiles.length > 0) {
+                files = allFiles;
+                fileRelativePaths = allPaths;
+                sourceFolderName = topFolder;
+                showSelectedCount();
+            }
+        } else {
+            handleFiles(e.dataTransfer.files);
+        }
     });
 
     fileInput.addEventListener('change', () => handleFiles(fileInput.files));
-    folderInput.addEventListener('change', () => handleFolderFiles(folderInput.files));
 
     function handleFiles(fileList) {
         files = Array.from(fileList).filter(f => f.type.startsWith('image/'));
@@ -85,21 +121,6 @@
         fileRelativePaths = {};
         sourceFolderName = 'Foto';
         files.forEach(f => { fileRelativePaths[f.name] = f.name; });
-        showSelectedCount();
-    }
-
-    function handleFolderFiles(fileList) {
-        const allFiles = Array.from(fileList).filter(f => f.type.startsWith('image/'));
-        if (!allFiles.length) return;
-        files = allFiles;
-        fileRelativePaths = {};
-        sourceFolderName = 'Foto';
-        allFiles.forEach(f => {
-            const relPath = f.webkitRelativePath || f.name;
-            fileRelativePaths[f.name] = relPath;
-            const parts = relPath.split('/');
-            if (parts.length > 1) sourceFolderName = parts[0];
-        });
         showSelectedCount();
     }
 
@@ -260,7 +281,7 @@
 
     resetBtn.addEventListener('click', () => {
         files = []; fileRelativePaths = {}; sourceFolderName = '';
-        fileInput.value = ''; folderInput.value = '';
+        fileInput.value = '';
         selectedFilesEl.innerHTML = '';
         uploadSection.classList.remove('hidden');
         settingsSection.classList.add('hidden');
@@ -274,7 +295,7 @@
     const homeBtn = $('homeBtn');
     homeBtn.addEventListener('click', () => {
         files = []; fileRelativePaths = {}; sourceFolderName = '';
-        fileInput.value = ''; folderInput.value = '';
+        fileInput.value = '';
         selectedFilesEl.innerHTML = '';
         uploadSection.style.display = '';
         uploadSection.classList.remove('hidden');
