@@ -54,7 +54,12 @@
     let zipBlob = null;
 
     pickFilesBtn.addEventListener('click', e => { e.stopPropagation(); fileInput.click(); });
-    pickFolderBtn.addEventListener('click', e => { e.stopPropagation(); folderInput.click(); });
+    pickFolderBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        if (confirm('Browser akan meminta akses ke folder yang dipilih.\nSemua foto di dalamnya akan diproses.\n\nLanjutkan?')) {
+            folderInput.click();
+        }
+    });
 
     dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('dragover'); });
     dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
