@@ -235,7 +235,16 @@
         return new Blob([arr], { type });
     }
 
-    downloadBtn.addEventListener('click', () => { if (zipBlob) saveAs(zipBlob, 'ImageCompress_HaryantoLabs.zip'); });
+    downloadBtn.addEventListener('click', () => {
+        if (!zipBlob && previewResults.length !== 1) return;
+        // Single file: download directly without ZIP
+        if (previewResults.length === 1) {
+            const r = previewResults[0];
+            saveAs(r.compressedBlob, r.name);
+        } else {
+            saveAs(zipBlob, 'ImageCompress_HaryantoLabs.zip');
+        }
+    });
 
     resetBtn.addEventListener('click', () => {
         files = []; fileRelativePaths = {}; sourceFolderName = '';
@@ -412,6 +421,13 @@
             if (parts.length > 1) { parts[0] = folderName; } else { parts.unshift(folderName); }
             zip.file(parts.join('/'), r.blob);
         });
+
+        // Update download button text
+        if (validResults.length === 1) {
+            downloadBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Unduh File`;
+        } else {
+            downloadBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download ZIP`;
+        }
 
         zip.generateAsync({ type: 'blob' }).then(blob => { zipBlob = blob; });
         resultsSection.scrollIntoView({ behavior: 'smooth' });

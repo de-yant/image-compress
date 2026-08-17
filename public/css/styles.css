@@ -546,12 +546,15 @@ body::after {
     margin-bottom: 14px;
     border-radius: var(--radius-sm);
     border: 1px solid var(--border);
+    -webkit-overflow-scrolling: touch;
+    position: relative;
 }
 
 .table {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.82rem;
+    min-width: 520px;
 }
 
 .table th {
@@ -564,6 +567,8 @@ body::after {
     text-transform: uppercase;
     letter-spacing: 0.04em;
     white-space: nowrap;
+    position: sticky;
+    top: 0;
 }
 
 .table td {
@@ -1052,13 +1057,26 @@ body::after {
     .summary-label { font-size: 0.65rem; }
     .summary-value { font-size: 0.85rem; }
 
-    .table { font-size: 0.72rem; }
+    .table-wrap { border-radius: 8px; margin-bottom: 10px; }
+    .table-wrap::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 32px;
+        background: linear-gradient(to right, transparent, var(--bg-card));
+        pointer-events: none;
+        opacity: 1;
+        transition: opacity 0.3s;
+    }
+    .table { font-size: 0.72rem; min-width: 460px; }
     .table th, .table td { padding: 7px 8px; }
-    .table th { font-size: 0.65rem; }
-    .cell-name { max-width: 100px; }
+    .table th { font-size: 0.62rem; }
+    .cell-name { max-width: 80px; font-size: 0.7rem; }
 
     .btn-group { flex-direction: column; gap: 8px; }
-    .btn-lg { padding: 12px 16px; font-size: 0.9rem; }
+    .btn-lg { padding: 12px 16px; font-size: 0.88rem; }
 
     .upload-buttons { grid-template-columns: 1fr 1fr; gap: 8px; }
     .btn { padding: 9px 14px; font-size: 0.82rem; }
@@ -1094,4 +1112,15 @@ body::after {
     .btn { padding: 10px 14px; font-size: 0.8rem; }
     .custom-input { flex-direction: column; }
     .input-field[type="number"] { width: 100%; }
+
+    .summary-grid { grid-template-columns: 1fr 1fr; gap: 4px; }
+    .summary-item { padding: 8px 6px; }
+    .summary-value { font-size: 0.8rem; }
+
+    .table-wrap { border-radius: 6px; }
+    .table { min-width: 400px; font-size: 0.68rem; }
+    .table th, .table td { padding: 5px 6px; }
+    .table th { font-size: 0.58rem; }
+    .cell-name { max-width: 60px; }
+    .badge { font-size: 0.6rem; padding: 2px 6px; }
 }
