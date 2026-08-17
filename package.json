@@ -1,0 +1,10 @@
+{
+    "name": "imagecompress",
+    "version": "1.0.0",
+    "private": true,
+    "description": "ImageCompress by HaryantoLabs - Kompresi foto batch lokal di browser",
+    "scripts": {
+        "dev": "npx serve public -p 3000",
+        "start": "npx serve public -p 3000"
+    }
+}
